@@ -71,7 +71,7 @@
                     <i class="fa-solid fa-prescription-bottle-medical text-lg"></i>
                 </div>
                 <div>
-                    <span class="text-xs font-semibold tracking-wider text-[#DC007B] uppercase block">Аптечный склад</span>
+                    <span class="text-xs font-semibold tracking-wider text-[#DC007B] uppercase block">Складик</span>
                     <h1 class="text-xl font-bold tracking-tight text-[#2F2580]">Апрель</h1>
                 </div>
             </div>
@@ -107,7 +107,7 @@
                     <input 
                         type="text" 
                         id="searchInput" 
-                        placeholder="Например: Аспирин, Анальгин, Холодильник..." 
+                        placeholder="Введите препарат" 
                         class="w-full pl-14 pr-12 py-4 bg-transparent text-slate-800 placeholder-slate-400 text-base sm:text-lg focus:outline-none rounded-2xl"
                         style="font-size: 16px;"
                         autofocus
@@ -136,36 +136,33 @@
 
     </main>
 
-    <!-- PIN Code Modal (Красивая плашка для ввода пароля) -->
-    <div id="pinModal" class="fixed inset-0 z-[80] bg-slate-900/60 backdrop-blur-md hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-6 text-center space-y-6 border border-slate-100 transform transition-all animate-in relative">
-            <div class="w-12 h-12 bg-[#2F2580]/10 text-[#2F2580] rounded-2xl flex items-center justify-center mx-auto text-xl shadow-inner">
+    <!-- Password Prompt Modal (Расширенные поля для ввода пин-кода) -->
+    <div id="passwordModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-6 text-center space-y-6 border border-slate-100 relative">
+            <div class="w-14 h-14 bg-[#2F2580]/10 text-[#2F2580] rounded-2xl flex items-center justify-center mx-auto text-xl shadow-inner">
                 <i class="fa-solid fa-shield-halved"></i>
             </div>
-            <div class="space-y-1">
-                <h3 class="font-bold text-lg text-slate-800">Введите ПИН-код</h3>
-                <p class="text-xs text-slate-500">Доступ к админ-панели управления</p>
+            <div class="space-y-1.5">
+                <h3 class="font-bold text-lg text-slate-800">Введите пароль админа</h3>
+                <p class="text-xs text-slate-500">Доступ к управлению шкафами</p>
             </div>
 
-            <!-- Невидимый инпут для вызова цифровой клавиатуры -->
-            <div class="relative max-w-[200px] mx-auto">
-                <input type="password" id="pinInput" maxlength="6" inputmode="numeric" pattern="[0-9]*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" style="font-size: 16px;">
-                
-                <!-- Красивые визуальные ячейки для цифр пароля -->
-                <div class="flex justify-between space-x-2 pointer-events-none" id="pinBoxes">
-                    <div class="w-9 h-11 rounded-xl border-2 border-slate-200 flex items-center justify-center text-lg font-bold text-slate-800 bg-slate-50"></div>
-                    <div class="w-9 h-11 rounded-xl border-2 border-slate-200 flex items-center justify-center text-lg font-bold text-slate-800 bg-slate-50"></div>
-                    <div class="w-9 h-11 rounded-xl border-2 border-slate-200 flex items-center justify-center text-lg font-bold text-slate-800 bg-slate-50"></div>
-                    <div class="w-9 h-11 rounded-xl border-2 border-slate-200 flex items-center justify-center text-lg font-bold text-slate-800 bg-slate-50"></div>
-                    <div class="w-9 h-11 rounded-xl border-2 border-slate-200 flex items-center justify-center text-lg font-bold text-slate-800 bg-slate-50"></div>
-                    <div class="w-9 h-11 rounded-xl border-2 border-slate-200 flex items-center justify-center text-lg font-bold text-slate-800 bg-slate-50"></div>
+            <div class="relative max-w-[280px] mx-auto">
+                <input type="tel" id="pinInput" maxlength="6" class="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer" autocomplete="one-time-code">
+                <div id="pinDots" class="flex justify-between items-center space-x-2.5 pointer-events-none">
+                    <div class="w-10 h-12 rounded-xl border-2 border-slate-200 flex items-center justify-center text-xl font-bold text-slate-800 bg-slate-50"></div>
+                    <div class="w-10 h-12 rounded-xl border-2 border-slate-200 flex items-center justify-center text-xl font-bold text-slate-800 bg-slate-50"></div>
+                    <div class="w-10 h-12 rounded-xl border-2 border-slate-200 flex items-center justify-center text-xl font-bold text-slate-800 bg-slate-50"></div>
+                    <div class="w-10 h-12 rounded-xl border-2 border-slate-200 flex items-center justify-center text-xl font-bold text-slate-800 bg-slate-50"></div>
+                    <div class="w-10 h-12 rounded-xl border-2 border-slate-200 flex items-center justify-center text-xl font-bold text-slate-800 bg-slate-50"></div>
+                    <div class="w-10 h-12 rounded-xl border-2 border-slate-200 flex items-center justify-center text-xl font-bold text-slate-800 bg-slate-50"></div>
                 </div>
             </div>
 
-            <div id="pinError" class="text-xs text-red-500 font-medium hidden">Неверный ПИН-код (попробуйте 525626)</div>
+            <div id="passwordError" class="text-xs text-red-500 font-semibold hidden">Неверный пароль! Попробуйте еще раз.</div>
 
             <div class="flex items-center space-x-3 pt-2">
-                <button type="button" id="cancelPinBtn" class="flex-1 py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium transition cursor-pointer">
+                <button type="button" id="cancelPasswordBtn" class="flex-1 py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium transition cursor-pointer">
                     Отмена
                 </button>
             </div>
@@ -183,7 +180,6 @@
                     </div>
                     <div>
                         <h3 class="font-bold text-lg text-slate-800">Админ-панель шкафов</h3>
-                        <p class="text-xs text-slate-500">Управление хранилищами и препаратами</p>
                     </div>
                 </div>
                 <button type="button" id="closeAdminBtn" class="w-9 h-9 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-800 flex items-center justify-center transition cursor-pointer">
@@ -193,15 +189,15 @@
 
             <!-- Modal Body -->
             <div class="p-6 overflow-y-auto flex-1 space-y-6">
-                <!-- Add new cabinet action bar (Выделенная стильная карточка высшего уровня) -->
-                <div class="bg-gradient-to-r from-indigo-50/80 via-white to-pink-50/40 border-2 border-[#2F2580]/20 rounded-2xl p-5 shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div class="text-left w-full sm:w-auto">
-                        <h4 class="font-extrabold text-base text-[#2F2580]">Добавить новое хранилище</h4>
-                        <p class="text-xs text-slate-500 mt-0.5" id="cabinetCountIndicator">Всего создано: 0 из 130</p>
+                <!-- Add new cabinet action bar (мягкая заливка без обводки) -->
+                <div class="bg-slate-100/80 rounded-3xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+                    <div class="text-left w-full sm:w-auto space-y-0.5">
+                        <h4 class="font-bold text-base text-slate-800">Добавить хранилище</h4>
+                        <p class="text-xs text-slate-500 font-medium" id="cabinetCountIndicator">Всего создано: 0 из 130</p>
                     </div>
-                    <button type="button" id="addCabinetBtn" class="w-full sm:w-auto px-5 py-3 rounded-xl bg-[#DC007B] hover:bg-[#c2006b] text-white text-sm font-semibold shadow-lg shadow-brand-pink/25 transition flex items-center justify-center space-x-2 cursor-pointer">
+                    <button type="button" id="addCabinetBtn" class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-[#DC007B] hover:bg-[#c2006b] text-white text-sm font-semibold shadow-lg shadow-brand-pink/25 transition flex items-center justify-center space-x-2 cursor-pointer">
                         <i class="fa-solid fa-plus text-xs"></i>
-                        <span>+ Добавить шкаф</span>
+                        <span>Добавить шкаф</span>
                     </button>
                 </div>
 
@@ -259,7 +255,7 @@
                         <span>1. Настройка в Админке</span>
                     </h4>
                     <p class="text-xs sm:text-sm text-slate-600">
-                        Откройте «Админку» по ПИН-коду, создайте шкаф или холодильник (добавив значок ❄️ в название), укажите описание и добавьте препараты со стикерами.
+                        Откройте «Админку», создайте шкаф, переименуйте его, укажите описание и добавьте внутрь список нужных лекарств (до 50 препаратов).
                     </p>
                 </div>
 
@@ -269,7 +265,7 @@
                         <span>2. Умный поиск на главном экране</span>
                     </h4>
                     <p class="text-xs sm:text-sm text-slate-600">
-                        Вводите название препарата или стикер в поисковую строку. Система мгновенно подсветит нужный шкаф или холодильник.
+                        Вводите название препарата в поисковую строку. Система мгновенно покажет, в каком шкафу он находится.
                     </p>
                 </div>
             </div>
@@ -367,14 +363,13 @@
         document.addEventListener('DOMContentLoaded', () => {
             const adminBtn = document.getElementById('adminBtn');
             const adminModal = document.getElementById('adminModal');
+            const passwordModal = document.getElementById('passwordModal');
+            const pinInput = document.getElementById('pinInput');
+            const cancelPasswordBtn = document.getElementById('cancelPasswordBtn');
+            const passwordError = document.getElementById('passwordError');
+
             const closeAdminBtn = document.getElementById('closeAdminBtn');
             const closeAdminBottomBtn = document.getElementById('closeAdminBottomBtn');
-
-            const pinModal = document.getElementById('pinModal');
-            const pinInput = document.getElementById('pinInput');
-            const cancelPinBtn = document.getElementById('cancelPinBtn');
-            const pinBoxes = document.getElementById('pinBoxes');
-            const pinError = document.getElementById('pinError');
 
             const infoBtn = document.getElementById('infoBtn');
             const infoModal = document.getElementById('infoModal');
@@ -388,61 +383,64 @@
             const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
             const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
 
-            // Обработка кнопки Админка (открытие пин-кода)
             if (adminBtn) {
                 adminBtn.addEventListener('click', (e) => {
                     e.preventDefault();
-                    if (pinModal) {
-                        pinModal.classList.remove('hidden');
+                    if (passwordModal) {
+                        passwordModal.classList.remove('hidden');
                         if (pinInput) {
                             pinInput.value = '';
-                            updatePinBoxes('');
-                            if (pinError) pinError.classList.add('hidden');
+                            updatePinDots('');
+                            if (passwordError) passwordError.classList.add('hidden');
                             setTimeout(() => pinInput.focus(), 100);
                         }
                     }
                 });
             }
 
-            if (cancelPinBtn) {
-                cancelPinBtn.addEventListener('click', () => {
-                    if (pinModal) pinModal.classList.add('hidden');
+            if (cancelPasswordBtn) {
+                cancelPasswordBtn.addEventListener('click', () => {
+                    if (passwordModal) passwordModal.classList.add('hidden');
                 });
             }
 
-            // Логика цифровых окошек ПИН-кода
             if (pinInput) {
                 pinInput.addEventListener('input', (e) => {
-                    const val = pinInput.value.replace(/\D/g, '').slice(0, 6);
+                    const val = e.target.value.replace(/\D/g, '').slice(0, 6);
                     pinInput.value = val;
-                    updatePinBoxes(val);
+                    updatePinDots(val);
 
-                    if (val === '525626') {
-                        if (pinModal) pinModal.classList.add('hidden');
-                        if (adminModal) {
-                            adminModal.classList.remove('hidden');
-                            renderAdminList();
+                    if (val.length === 6) {
+                        if (val === '525626') {
+                            passwordModal.classList.add('hidden');
+                            if (adminModal) {
+                                adminModal.classList.remove('hidden');
+                                renderAdminList();
+                            }
+                        } else {
+                            if (passwordError) passwordError.classList.remove('hidden');
+                            setTimeout(() => {
+                                pinInput.value = '';
+                                updatePinDots('');
+                                if (passwordError) passwordError.classList.add('hidden');
+                            }, 1200);
                         }
-                    } else if (val.length === 6) {
-                        if (pinError) pinError.classList.remove('hidden');
-                        setTimeout(() => {
-                            pinInput.value = '';
-                            updatePinBoxes('');
-                            if (pinError) pinError.classList.add('hidden');
-                        }, 1000);
                     }
                 });
             }
 
-            function updatePinBoxes(val) {
-                if (!pinBoxes) return;
-                const boxes = pinBoxes.children;
+            function updatePinDots(val) {
+                const dotsContainer = document.getElementById('pinDots');
+                if (!dotsContainer) return;
+                const boxes = dotsContainer.children;
                 for (let i = 0; i < 6; i++) {
-                    boxes[i].textContent = val[i] ? '•' : '';
-                    if (val[i]) {
-                        boxes[i].classList.add('border-[#DC007B]', 'bg-pink-50/50');
-                    } else {
-                        boxes[i].classList.remove('border-[#DC007B]', 'bg-pink-50/50');
+                    if (boxes[i]) {
+                        boxes[i].textContent = val[i] ? '•' : '';
+                        if (val[i]) {
+                            boxes[i].classList.add('border-[#2F2580]', 'bg-indigo-50/50');
+                        } else {
+                            boxes[i].classList.remove('border-[#2F2580]', 'bg-indigo-50/50');
+                        }
                     }
                 }
             }
@@ -631,13 +629,13 @@
                 card.innerHTML = `
                     <div>
                         <div class="flex items-start justify-between mb-3">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-11 h-11 rounded-2xl bg-[#2F2580] text-white flex items-center justify-center font-bold text-base shadow-sm shadow-[#2F2580]/30">
+                            <div class="flex items-center space-x-3 min-w-0">
+                                <div class="w-11 h-11 rounded-2xl bg-[#2F2580] text-white flex items-center justify-center font-bold text-base shadow-sm shadow-[#2F2580]/30 shrink-0">
                                     <i class="fa-solid fa-box"></i>
                                 </div>
-                                <div>
-                                    <h3 class="font-extrabold text-lg text-[#2F2580]">${escapeHtml(cab.name)}</h3>
-                                    <p class="text-xs text-slate-600 font-medium mt-0.5">${escapeHtml(cab.description || 'Без описания')}</p>
+                                <div class="min-w-0">
+                                    <h3 class="font-extrabold text-lg text-[#2F2580] truncate">${escapeHtml(cab.name)}</h3>
+                                    <p class="text-xs text-slate-600 font-medium mt-0.5 truncate">${escapeHtml(cab.description || 'Без описания')}</p>
                                 </div>
                             </div>
                         </div>
@@ -663,7 +661,7 @@
                 return;
             }
 
-            cabinetsCache.forEach((cab, index) => {
+            cabinetsCache.forEach((cab) => {
                 const item = document.createElement('div');
                 item.className = "bg-white border border-brand-borderLight rounded-2xl p-4 shadow-sm space-y-3 transition";
 
@@ -672,38 +670,35 @@
                     adminTagsHtml = cab.tags.map((tag, tIndex) => `
                         <span class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-xl bg-slate-100 border border-slate-200 text-xs font-medium text-slate-700">
                             <span>${escapeHtml(tag)}</span>
-                            <button type="button" onclick="window.removeTag('${cab.id}',${tIndex})" class="text-slate-400 hover:text-red-600 ml-1 transition cursor-pointer">
+                            <button type="button" onclick="window.removeTag('${cab.id}', ${tIndex})" class="text-slate-400 hover:text-red-600 ml-1 transition cursor-pointer">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
                         </span>
                     `).join('');
-                } else {
-                    adminTagsHtml = ``;
                 }
 
                 const descriptionSubText = cab.description && cab.description.trim() !== '' 
-                    ? `<p class="text-xs text-slate-500 truncate max-w-xs sm:max-w-md">${escapeHtml(cab.description)}</p>` 
+                    ? `<p class="text-xs text-slate-500 truncate">${escapeHtml(cab.description)}</p>` 
                     : `<p class="text-xs text-slate-400 italic">Без описания</p>`;
 
                 const isOpen = activeAccordionId === cab.id;
                 const hiddenClass = isOpen ? '' : 'hidden';
                 const rotateClass = isOpen ? 'rotate-180' : '';
+                const tagCount = cab.tags ? cab.tags.length : 0;
 
                 item.innerHTML = `
                     <div class="flex items-center justify-between cursor-pointer" onclick="window.toggleAccordion('${cab.id}')">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-8 h-8 rounded-lg bg-indigo-50 text-[#2F2580] flex items-center justify-center font-bold text-xs">
-                                ${index + 1}
-                            </div>
-                            <div>
-                                <span class="font-bold text-sm text-slate-800 block">${escapeHtml(cab.name)}</span>
+                        <div class="flex items-center space-x-3 min-w-0 pr-2 flex-1">
+                            <!-- Иконка мусорки вместо цифры -->
+                            <button type="button" onclick="event.stopPropagation(); window.deleteCabinet('${cab.id}')" class="w-9 h-9 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-700 flex items-center justify-center transition shrink-0 cursor-pointer" title="Удалить шкаф">
+                                <i class="fa-solid fa-trash-can text-xs"></i>
+                            </button>
+                            <div class="min-w-0 flex-1">
+                                <span class="font-bold text-sm text-slate-800 block truncate">${escapeHtml(cab.name)}</span>
                                 ${descriptionSubText}
                             </div>
                         </div>
-                        <div class="flex items-center space-x-2">
-                            <button type="button" onclick="event.stopPropagation(); window.deleteCabinet('${cab.id}')" class="w-8 h-8 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 flex items-center justify-center transition cursor-pointer" title="Удалить шкаф">
-                                <i class="fa-solid fa-trash-can text-xs"></i>
-                            </button>
+                        <div class="flex items-center space-x-2 shrink-0">
                             <i id="icon_${cab.id}" class="fa-solid fa-chevron-down text-xs text-slate-400 transition-transform ${rotateClass}"></i>
                         </div>
                     </div>
@@ -721,12 +716,15 @@
                         </div>
 
                         <div>
-                            <label class="block text-[11px] font-semibold text-slate-500 uppercase mb-1.5">Препараты</label>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label class="block text-[11px] font-semibold text-slate-500 uppercase">Препараты</label>
+                                <span class="text-[11px] font-medium text-slate-400">${tagCount} / 50</span>
+                            </div>
                             <div class="flex flex-wrap gap-1.5 mb-2.5">
                                 ${adminTagsHtml}
                             </div>
                             <div class="flex items-center space-x-2">
-                                <input type="text" id="newtag_${cab.id}" placeholder="Введите препарат со стикером..." onkeydown="if(event.key === 'Enter') { window.addTag('${cab.id}'); } else { window.handleFastDelete(event, this); }" class="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-[#DC007B]" style="font-size: 16px;">
+                                <input type="text" id="newtag_${cab.id}" placeholder="Введите название препарата..." onkeydown="if(event.key === 'Enter') { window.addTag('${cab.id}'); } else { window.handleFastDelete(event, this); }" class="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-[#DC007B]" style="font-size: 16px;">
                                 <button type="button" onclick="window.addTag('${cab.id}')" class="px-4 py-2 bg-[#DC007B] hover:bg-[#c2006b] text-white text-xs font-medium rounded-xl transition shadow-sm cursor-pointer">
                                     Добавить
                                 </button>
@@ -815,6 +813,12 @@
             if (!cab) return;
 
             if (!cab.tags) cab.tags = [];
+            
+            if (cab.tags.length >= 50) {
+                alert("Достигнут максимум в 50 препаратов для одного шкафа!");
+                return;
+            }
+
             if (!cab.tags.includes(tagVal)) {
                 cab.tags.push(tagVal);
                 input.value = '';
