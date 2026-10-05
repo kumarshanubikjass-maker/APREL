@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Апрель — Интерактивный поиск по шкафам</title>
     <!-- Tailwind CSS for modern responsive utility-first styling -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -97,9 +97,6 @@
             <h2 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-[#2F2580]">
                 Апрель
             </h2>
-            <p class="text-slate-500 text-sm sm:text-base max-w-md mx-auto">
-                Интеллектуальная система быстрого поиска лекарств по шкафам и стеллажам. Введите название препарата ниже.
-            </p>
 
             <!-- Search Bar with Glow Effect -->
             <div class="max-w-2xl mx-auto w-full relative">
@@ -112,6 +109,7 @@
                         id="searchInput" 
                         placeholder="Например: Аспирин, Анальгин, Парацетамол..." 
                         class="w-full pl-14 pr-12 py-4 bg-transparent text-slate-800 placeholder-slate-400 text-base sm:text-lg focus:outline-none rounded-2xl"
+                        style="font-size: 16px;"
                         autofocus
                     >
                     <button type="button" id="clearSearchBtn" class="hidden pr-5 text-slate-400 hover:text-[#DC007B] transition cursor-pointer">
@@ -124,7 +122,7 @@
             <div id="searchStats" class="text-xs text-slate-400 font-medium pt-1"></div>
         </div>
 
-        <!-- Results Container (отступ уменьшен еще в два раза: mt-1 вместо mt-2) -->
+        <!-- Results Container -->
         <div id="cabinetsContainer" class="w-full grid grid-cols-1 md:grid-cols-2 gap-5 mt-1"></div>
 
         <!-- Empty State -->
@@ -161,7 +159,7 @@
             <div class="p-6 overflow-y-auto flex-1 space-y-6">
                 <!-- Add new cabinet action bar -->
                 <div class="bg-[#F8FAFC] border border-brand-borderLight rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-                    <div>
+                    <div class="text-left w-full sm:w-auto">
                         <h4 class="font-semibold text-sm text-slate-800">Добавить новое хранилище</h4>
                         <p class="text-xs text-slate-500" id="cabinetCountIndicator">Всего создано: 0 из 130</p>
                     </div>
@@ -205,7 +203,7 @@
         </div>
     </div>
 
-    <!-- Info Modal (Инструкция / Обучалка) -->
+    <!-- Info Modal (Инструкция) -->
     <div id="infoModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-3xl shadow-2xl max-w-xl w-full p-6 sm:p-8 space-y-6 relative border border-slate-100">
             <div class="flex items-center space-x-3">
@@ -251,10 +249,9 @@
     <!-- Firebase & Main Application Script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
-        // Ваша точная конфигурация из панели Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAyOaMhyGRXCJ3YbdhGdE8RKCi-uqc8Jys",
             authDomain: "aprel-c6a80.firebaseapp.com",
@@ -268,6 +265,7 @@
         let cabinetsCache = [];
         let unsubscribeCabinets = null;
         let cabinetToDeleteId = null;
+        let activeAccordionId = null;
 
         try {
             app = initializeApp(firebaseConfig);
@@ -276,11 +274,7 @@
 
             const initAuth = async () => {
                 try {
-                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } else {
-                        await signInAnonymously(auth);
-                    }
+                    await signInAnonymously(auth);
                     startCabinetsListener();
                 } catch (err) {
                     console.error("Auth error:", err);
@@ -357,6 +351,7 @@
                 if (btn) {
                     btn.addEventListener('click', () => {
                         if (adminModal) adminModal.classList.add('hidden');
+                        activeAccordionId = null;
                         updateUI();
                     });
                 }
@@ -375,6 +370,7 @@
                     const cabId = cabinetToDeleteId;
                     
                     if (deleteConfirmModal) deleteConfirmModal.classList.add('hidden');
+                    if (activeAccordionId === cabId) activeAccordionId = null;
                     cabinetToDeleteId = null;
 
                     cabinetsCache = cabinetsCache.filter(c => c.id !== cabId);
@@ -448,6 +444,7 @@
                         updatedAt: Date.now()
                     };
 
+                    activeAccordionId = newId;
                     cabinetsCache.push({ id: newId, ...newCab });
                     updateUI();
 
@@ -519,8 +516,9 @@
                 if (cab.tags && cab.tags.length > 0) {
                     tagsHtml = cab.tags.map(tag => {
                         const isMatch = searchQuery !== '' && tag.toLowerCase().includes(searchQuery);
+                        // Снижена яркость (добавлена прозрачность /80) для выделенного тега
                         const tagClass = isMatch 
-                            ? "bg-[#DC007B] text-white font-bold shadow-sm" 
+                            ? "bg-[#DC007B]/80 text-white font-bold shadow-sm" 
                             : "bg-white text-slate-700 hover:bg-slate-100 border border-slate-200/80 font-medium";
                         return `<span class="px-3 py-1.5 rounded-xl text-xs transition ${tagClass}">${tag}</span>`;
                     }).join('');
@@ -556,19 +554,10 @@
         function renderAdminList() {
             const adminListEl = document.getElementById('adminCabinetsList');
             if (!adminListEl) return;
-            
-            const openAccordions = {};
-            adminListEl.querySelectorAll('[id^="acc_"]').forEach(acc => {
-                if (!acc.classList.contains('hidden')) {
-                    const id = acc.id.replace('acc_', '');
-                    openAccordions[id] = true;
-                }
-            });
 
             adminListEl.innerHTML = '';
 
             if (cabinetsCache.length === 0) {
-                adminListEl.innerHTML = ``;
                 return;
             }
 
@@ -594,7 +583,7 @@
                     ? `<p class="text-xs text-slate-500 truncate max-w-xs sm:max-w-md">${escapeHtml(cab.description)}</p>` 
                     : `<p class="text-xs text-slate-400 italic">Без описания</p>`;
 
-                const isOpen = openAccordions[cab.id];
+                const isOpen = activeAccordionId === cab.id;
                 const hiddenClass = isOpen ? '' : 'hidden';
                 const rotateClass = isOpen ? 'rotate-180' : '';
 
@@ -621,11 +610,11 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-[11px] font-semibold text-slate-500 uppercase mb-1">Наименование шкафа / стеллажа</label>
-                                <input type="text" id="name_${cab.id}" value="${escapeHtml(cab.name)}" oninput="window.saveCabinetFieldSilent('${cab.id}', 'name', this.value)" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-[#2F2580]">
+                                <input type="text" id="name_${cab.id}" value="${escapeHtml(cab.name)}" onkeydown="window.handleFastDelete(event, this)" oninput="window.saveCabinetFieldSilent('${cab.id}', 'name', this.value)" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-[#2F2580]" style="font-size: 16px;">
                             </div>
                             <div>
                                 <label class="block text-[11px] font-semibold text-slate-500 uppercase mb-1">Описание / расположение</label>
-                                <input type="text" id="desc_${cab.id}" value="${escapeHtml(cab.description || '')}" oninput="window.saveCabinetFieldSilent('${cab.id}', 'description', this.value)" placeholder="Например: Кардиологический сектор..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-[#2F2580]">
+                                <input type="text" id="desc_${cab.id}" value="${escapeHtml(cab.description || '')}" onkeydown="window.handleFastDelete(event, this)" oninput="window.saveCabinetFieldSilent('${cab.id}', 'description', this.value)" placeholder="Например: Кардиологический сектор..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-[#2F2580]" style="font-size: 16px;">
                             </div>
                         </div>
 
@@ -635,7 +624,7 @@
                                 ${adminTagsHtml}
                             </div>
                             <div class="flex items-center space-x-2">
-                                <input type="text" id="newtag_${cab.id}" placeholder="Введите название препарата..." class="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-[#DC007B]" onkeypress="if(event.key === 'Enter') { window.addTag('${cab.id}'); }">
+                                <input type="text" id="newtag_${cab.id}" placeholder="Введите название препарата..." onkeydown="if(event.key === 'Enter') { window.addTag('${cab.id}'); } else { window.handleFastDelete(event, this); }" class="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-[#DC007B]" style="font-size: 16px;">
                                 <button type="button" onclick="window.addTag('${cab.id}')" class="px-4 py-2 bg-[#DC007B] hover:bg-[#c2006b] text-white text-xs font-medium rounded-xl transition shadow-sm cursor-pointer">
                                     Добавить
                                 </button>
@@ -647,18 +636,37 @@
             });
         }
 
-        window.toggleAccordion = function(cabId) {
-            const acc = document.getElementById(`acc_${cabId}`);
-            const icon = document.getElementById(`icon_${cabId}`);
-            if (acc) {
-                if (acc.classList.contains('hidden')) {
-                    acc.classList.remove('hidden');
-                    if (icon) icon.classList.add('rotate-180');
-                } else {
-                    acc.classList.add('hidden');
-                    if (icon) icon.classList.remove('rotate-180');
-                }
+        let deleteInterval = null;
+        window.handleFastDelete = function(e, inputElement) {
+            if (e.key === 'Backspace') {
+                if (!e.repeat) return;
+                if (deleteInterval) return;
+                
+                deleteInterval = setInterval(() => {
+                    inputElement.value = '';
+                    inputElement.dispatchEvent(new Event('input', { bubbles: true }));
+                    if (inputElement.value === '') {
+                        clearInterval(deleteInterval);
+                        deleteInterval = null;
+                    }
+                }, 40);
+
+                document.addEventListener('keyup', () => {
+                    if (deleteInterval) {
+                        clearInterval(deleteInterval);
+                        deleteInterval = null;
+                    }
+                }, { once: true });
             }
+        };
+
+        window.toggleAccordion = function(cabId) {
+            if (activeAccordionId === cabId) {
+                activeAccordionId = null;
+            } else {
+                activeAccordionId = cabId;
+            }
+            renderAdminList();
         };
 
         window.saveCabinetFieldSilent = async function(cabId, field, value) {
@@ -710,8 +718,6 @@
                 input.value = '';
                 cab.updatedAt = Date.now();
                 updateUI();
-                const acc = document.getElementById(`acc_${cabId}`);
-                if (acc) acc.classList.remove('hidden');
 
                 try {
                     await setDoc(doc(db, 'cabinets', cabId), {
@@ -733,9 +739,6 @@
             cab.tags.splice(tagIndex, 1);
             cab.updatedAt = Date.now();
             updateUI();
-            
-            const acc = document.getElementById(`acc_${cabId}`);
-            if (acc) acc.classList.remove('hidden');
 
             try {
                 await setDoc(doc(db, 'cabinets', cabId), {
